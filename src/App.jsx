@@ -107,6 +107,7 @@ function App() {
 
   const handleCloseProductModal = () => {
     productModalInstance.current.hide();
+    setInputErrors({});
   };
 
   const handleOpenRemoveModal = (product) => {
@@ -140,6 +141,13 @@ function App() {
       ...tempProduct,
       [name]: type === "checkbox" ? checked : value,
     });
+
+    if (inputErrors[name]) {
+      setInputErrors({
+        ...inputErrors,
+        [name]: "",
+      });
+    }
   };
 
   const handleImageChange = (e, index) => {
@@ -211,15 +219,60 @@ function App() {
     }
   };
 
+  const [inputErrors, setInputErrors] = useState({});
+
+  const validUpdateProduct = () => {
+    let isValid = true;
+    let newErrors = {};
+
+    if (!tempProduct.imageUrl.trim()) {
+      newErrors.imageUrl = "請輸入主圖網址";
+      isValid = false;
+    }
+    if (!tempProduct.title.trim()) {
+      newErrors.title = "請輸入標題";
+      isValid = false;
+    }
+    if (!tempProduct.category.trim()) {
+      newErrors.category = "請輸入分類";
+      isValid = false;
+    }
+    if (!tempProduct.unit.trim()) {
+      newErrors.unit = "請輸入分類";
+      isValid = false;
+    }
+    if (!tempProduct.origin_price.trim()) {
+      newErrors.origin_price = "請輸入原價";
+      isValid = false;
+    }
+    if (!tempProduct.price.trim()) {
+      newErrors.price = "請輸入售價";
+      isValid = false;
+    }
+    if (!tempProduct.description.trim()) {
+      newErrors.description = "請輸入產品描述";
+      isValid = false;
+    }
+    if (!tempProduct.content.trim()) {
+      newErrors.content = "請輸入說明內容";
+      isValid = false;
+    }
+
+    setInputErrors(newErrors);
+    return isValid;
+  };
+
   const handleUpdateProduct = async () => {
     const apiCall = modalMode === "edit" ? editProduct : createProduct;
 
-    try {
-      await apiCall();
-      getProducts();
-      handleCloseProductModal();
-    } catch (error) {
-      alert("更新產品失敗");
+    if (validUpdateProduct()) {
+      try {
+        await apiCall();
+        getProducts();
+        handleCloseProductModal();
+      } catch (error) {
+        alert("更新產品失敗");
+      }
     }
   };
 
@@ -317,7 +370,9 @@ function App() {
                 value={account.username}
                 onChange={handleLoginInputChange}
                 type="email"
-                className="form-control"
+                className={`form-control ${
+                  inputErrors.title ? "is-invalid" : ""
+                }`}
                 id="username"
                 placeholder="name@example.com"
               />
@@ -329,7 +384,9 @@ function App() {
                 value={account.password}
                 onChange={handleLoginInputChange}
                 type="password"
-                className="form-control"
+                className={`form-control ${
+                  inputErrors.title ? "is-invalid" : ""
+                }`}
                 id="password"
                 placeholder="Password"
               />
@@ -367,16 +424,22 @@ function App() {
                     <label htmlFor="primary-image" className="form-label">
                       主圖
                     </label>
-                    <div className="input-group">
+                    <div className="input-group has-validation">
                       <input
+                        required
                         name="imageUrl"
                         type="text"
                         value={tempProduct.imageUrl}
                         onChange={handleProductInputChange}
                         id="primary-image"
-                        className="form-control"
+                        className={`form-control ${
+                          inputErrors.imageUrl ? "is-invalid" : ""
+                        }`}
                         placeholder="請輸入圖片連結"
                       />
+                      <div className="invalid-feedback">
+                        {inputErrors.imageUrl}
+                      </div>
                     </div>
                     <img
                       src={tempProduct.imageUrl}
@@ -450,9 +513,12 @@ function App() {
                       type="text"
                       value={tempProduct.title}
                       onChange={handleProductInputChange}
-                      className="form-control"
+                      className={`form-control ${
+                        inputErrors.title ? "is-invalid" : ""
+                      }`}
                       placeholder="請輸入標題"
                     />
+                    <div className="invalid-feedback">{inputErrors.title}</div>
                   </div>
 
                   <div className="mb-3">
@@ -465,9 +531,14 @@ function App() {
                       type="text"
                       value={tempProduct.category}
                       onChange={handleProductInputChange}
-                      className="form-control"
+                      className={`form-control ${
+                        inputErrors.category ? "is-invalid" : ""
+                      }`}
                       placeholder="請輸入分類"
                     />
+                    <div className="invalid-feedback">
+                      {inputErrors.category}
+                    </div>
                   </div>
 
                   <div className="mb-3">
@@ -480,9 +551,12 @@ function App() {
                       type="text"
                       value={tempProduct.unit}
                       onChange={handleProductInputChange}
-                      className="form-control"
+                      className={`form-control ${
+                        inputErrors.unit ? "is-invalid" : ""
+                      }`}
                       placeholder="請輸入單位"
                     />
+                    <div className="invalid-feedback">{inputErrors.unit}</div>
                   </div>
 
                   <div className="row g-3 mb-3">
@@ -496,9 +570,14 @@ function App() {
                         type="number"
                         value={tempProduct.origin_price}
                         onChange={handleProductInputChange}
-                        className="form-control"
+                        className={`form-control ${
+                          inputErrors.origin_price ? "is-invalid" : ""
+                        }`}
                         placeholder="請輸入原價"
                       />
+                      <div className="invalid-feedback">
+                        {inputErrors.origin_price}
+                      </div>
                     </div>
                     <div className="col-6">
                       <label htmlFor="price" className="form-label">
@@ -510,9 +589,14 @@ function App() {
                         type="number"
                         value={tempProduct.price}
                         onChange={handleProductInputChange}
-                        className="form-control"
+                        className={`form-control ${
+                          inputErrors.price ? "is-invalid" : ""
+                        }`}
                         placeholder="請輸入售價"
                       />
+                      <div className="invalid-feedback">
+                        {inputErrors.price}
+                      </div>
                     </div>
                   </div>
 
@@ -525,10 +609,15 @@ function App() {
                       id="description"
                       value={tempProduct.description}
                       onChange={handleProductInputChange}
-                      className="form-control"
+                      className={`form-control ${
+                        inputErrors.description ? "is-invalid" : ""
+                      }`}
                       rows={4}
                       placeholder="請輸入產品描述"
                     ></textarea>
+                    <div className="invalid-feedback">
+                      {inputErrors.description}
+                    </div>
                   </div>
 
                   <div className="mb-3">
@@ -540,10 +629,15 @@ function App() {
                       id="content"
                       value={tempProduct.content}
                       onChange={handleProductInputChange}
-                      className="form-control"
+                      className={`form-control ${
+                        inputErrors.content ? "is-invalid" : ""
+                      }`}
                       rows={4}
                       placeholder="請輸入說明內容"
                     ></textarea>
+                    <div className="invalid-feedback">
+                      {inputErrors.content}
+                    </div>
                   </div>
 
                   <div className="form-check">
@@ -573,9 +667,7 @@ function App() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  handleUpdateProduct();
-                }}
+                onClick={handleUpdateProduct}
                 className="btn btn-primary"
               >
                 確認
