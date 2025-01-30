@@ -45,6 +45,7 @@ function App() {
       document.cookie = `hexToken=${token}; expires=${new Date(expired)}`;
 
       axios.defaults.headers.common["Authorization"] = token;
+      checkUserLogin();
     } catch (error) {
       alert("登入失敗");
     }
@@ -270,7 +271,13 @@ function App() {
                       <th scope="row">{product.title}</th>
                       <td>{product.origin_price}</td>
                       <td>{product.price}</td>
-                      <td>{product.is_enabled}</td>
+                      <td>
+                        {product.is_enabled ? (
+                          <div className="text-success">啟用</div>
+                        ) : (
+                          "關閉"
+                        )}
+                      </td>
                       <td>
                         <div className="btn-group">
                           <button
